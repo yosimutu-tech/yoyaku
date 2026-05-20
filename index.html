@@ -111,6 +111,13 @@
       margin-top: 10px;
     }
 
+    .result .date-display {
+      font-size: 15px;
+      color: #2a7abf;
+      margin-top: 6px;
+      font-weight: bold;
+    }
+
     .error {
       color: red;
       font-size: 13px;
@@ -132,7 +139,7 @@
 <body>
   <div class="container">
     <h1>🏥 病院予約システム</h1>
-    <p class="subtitle">お名前と患者番号を入力してください</p>
+    <p class="subtitle">お名前・患者番号・予約日を入力してください</p>
 
     <label for="name">お名前</label>
     <input type="text" id="name" placeholder="例：山田 太郎">
@@ -142,11 +149,16 @@
     <input type="text" id="patientId" placeholder="例：12345">
     <p class="error" id="patientIdError">※ 患者番号を入力してください</p>
 
+    <label for="reserveDate">予約日</label>
+    <input type="date" id="reserveDate">
+    <p class="error" id="dateError">※ 予約日を選択してください</p>
+
     <button onclick="reserve()">予約する</button>
 
     <div class="result" id="result">
-      <p>予約が完了しました！</p>
+      <p>✅ 予約が完了しました！</p>
       <p class="name-display" id="displayName"></p>
+      <p class="date-display" id="displayDate"></p>
       <p style="margin-top:12px; font-size:14px; color:#888;">あなたの予約番号</p>
       <div class="booking-number" id="bookingNumber"></div>
       <p style="margin-top:12px; font-size:12px; color:#aaa;">この番号をお控えください</p>
@@ -157,15 +169,34 @@
   <script>
     let bookingCounter = 1;
 
+    // 今日の日付を取得してdate inputの最小値に設定（過去の日付を選べないようにする）
+    window.onload = function () {
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('reserveDate').setAttribute('min', today);
+    };
+
+    function formatDate(dateStr) {
+      const date = new Date(dateStr);
+      const year = date.getFullYear();
+      const month = date.getMonth() + 1;
+      const day = date.getDate();
+      const weekdays = ['日', '月', '火', '水', '木', '金', '土'];
+      const weekday = weekdays[date.getDay()];
+      return `${year}年${month}月${day}日（${weekday}）`;
+    }
+
     function reserve() {
       const name = document.getElementById('name').value.trim();
       const patientId = document.getElementById('patientId').value.trim();
+      const reserveDate = document.getElementById('reserveDate').value;
       const nameError = document.getElementById('nameError');
       const patientIdError = document.getElementById('patientIdError');
+      const dateError = document.getElementById('dateError');
 
       // エラーリセット
       nameError.style.display = 'none';
       patientIdError.style.display = 'none';
+      dateError.style.display = 'none';
 
       // バリデーション
       let hasError = false;
@@ -177,6 +208,10 @@
         patientIdError.style.display = 'block';
         hasError = true;
       }
+      if (!reserveDate) {
+        dateError.style.display = 'block';
+        hasError = true;
+      }
       if (hasError) return;
 
       // 予約番号生成（A + 4桁の連番）
@@ -185,19 +220,23 @@
 
       // 結果を表示
       document.getElementById('displayName').textContent = `${name} 様`;
+      document.getElementById('displayDate').textContent = `📅 予約日：${formatDate(reserveDate)}`;
       document.getElementById('bookingNumber').textContent = bookingNumber;
       document.getElementById('result').style.display = 'block';
 
       // 入力欄を無効化
       document.getElementById('name').disabled = true;
       document.getElementById('patientId').disabled = true;
+      document.getElementById('reserveDate').disabled = true;
     }
 
     function resetForm() {
       document.getElementById('name').value = '';
       document.getElementById('patientId').value = '';
+      document.getElementById('reserveDate').value = '';
       document.getElementById('name').disabled = false;
       document.getElementById('patientId').disabled = false;
+      document.getElementById('reserveDate').disabled = false;
       document.getElementById('result').style.display = 'none';
     }
   </script>

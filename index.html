@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>病院予約システム</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #eaf4fb;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      background-color: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+      padding: 40px;
+      width: 100%;
+      max-width: 420px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #2a7abf;
+      margin-bottom: 8px;
+      font-size: 24px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #888;
+      font-size: 14px;
+      margin-bottom: 30px;
+    }
+
+    label {
+      display: block;
+      font-size: 14px;
+      color: #555;
+      margin-bottom: 6px;
+      font-weight: bold;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 16px;
+      margin-bottom: 20px;
+      transition: border 0.3s;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #2a7abf;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      background-color: #2a7abf;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #1f5f9e;
+    }
+
+    .result {
+      display: none;
+      margin-top: 28px;
+      background-color: #eaf4fb;
+      border-left: 4px solid #2a7abf;
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .result p {
+      color: #555;
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+
+    .result .booking-number {
+      font-size: 36px;
+      font-weight: bold;
+      color: #2a7abf;
+      letter-spacing: 4px;
+    }
+
+    .result .name-display {
+      font-size: 16px;
+      color: #333;
+      margin-top: 10px;
+    }
+
+    .error {
+      color: red;
+      font-size: 13px;
+      margin-top: -16px;
+      margin-bottom: 12px;
+      display: none;
+    }
+
+    .reset-btn {
+      margin-top: 16px;
+      background-color: #888;
+    }
+
+    .reset-btn:hover {
+      background-color: #666;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🏥 病院予約システム</h1>
+    <p class="subtitle">お名前と患者番号を入力してください</p>
+
+    <label for="name">お名前</label>
+    <input type="text" id="name" placeholder="例：山田 太郎">
+    <p class="error" id="nameError">※ お名前を入力してください</p>
+
+    <label for="patientId">患者番号</label>
+    <input type="text" id="patientId" placeholder="例：12345">
+    <p class="error" id="patientIdError">※ 患者番号を入力してください</p>
+
+    <button onclick="reserve()">予約する</button>
+
+    <div class="result" id="result">
+      <p>予約が完了しました！</p>
+      <p class="name-display" id="displayName"></p>
+      <p style="margin-top:12px; font-size:14px; color:#888;">あなたの予約番号</p>
+      <div class="booking-number" id="bookingNumber"></div>
+      <p style="margin-top:12px; font-size:12px; color:#aaa;">この番号をお控えください</p>
+      <button class="reset-btn" onclick="resetForm()">新しい予約をする</button>
+    </div>
+  </div>
+
+  <script>
+    let bookingCounter = 1;
+
+    function reserve() {
+      const name = document.getElementById('name').value.trim();
+      const patientId = document.getElementById('patientId').value.trim();
+      const nameError = document.getElementById('nameError');
+      const patientIdError = document.getElementById('patientIdError');
+
+      // エラーリセット
+      nameError.style.display = 'none';
+      patientIdError.style.display = 'none';
+
+      // バリデーション
+      let hasError = false;
+      if (!name) {
+        nameError.style.display = 'block';
+        hasError = true;
+      }
+      if (!patientId) {
+        patientIdError.style.display = 'block';
+        hasError = true;
+      }
+      if (hasError) return;
+
+      // 予約番号生成（A + 4桁の連番）
+      const bookingNumber = 'A' + String(bookingCounter).padStart(4, '0');
+      bookingCounter++;
+
+      // 結果を表示
+      document.getElementById('displayName').textContent = `${name} 様`;
+      document.getElementById('bookingNumber').textContent = bookingNumber;
+      document.getElementById('result').style.display = 'block';
+
+      // 入力欄を無効化
+      document.getElementById('name').disabled = true;
+      document.getElementById('patientId').disabled = true;
+    }
+
+    function resetForm() {
+      document.getElementById('name').value = '';
+      document.getElementById('patientId').value = '';
+      document.getElementById('name').disabled = false;
+      document.getElementById('patientId').disabled = false;
+      document.getElementById('result').style.display = 'none';
+    }
+  </script>
+</body>
+</html>
